@@ -11,6 +11,8 @@ Step 2 : Download Evaluation data  ("eval1_unlabelled.tsv") from codalab  keep i
 Step 3 : run "BaselineBM25.py" file for running BM25 technique
 			python BaselineBM25.py
 
+bm25original gave best results
+
 Step 4 : you should see "answer.tsv" file generated with query-passage similarity scores for Evaluation data. The format of the file will be queryid followed by 10 similarity scores.
 
 Step 5 : Compress(zip) the submission file(answer.tsv) and upload in codalab
