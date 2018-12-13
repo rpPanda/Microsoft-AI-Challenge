@@ -4,6 +4,9 @@ import string
 import string
 from nltk.corpus import stopwords       
 from nltk.tokenize import word_tokenize
+from nltk.stem import PorterStemmer
+import time
+import Stemmer
 #Initialize Global variables 
 docIDFDict = {}
 avgDocLength = 0
@@ -13,6 +16,10 @@ intab = string.punctuation
 lenstr = len(string.punctuation)
 outtab = " " * lenstr
 trantab = str.maketrans(intab, outtab)
+ps = PorterStemmer()
+start=time.time()
+stemmer=Stemmer.Stemmer('english')
+
 
 def GetCorpus(inputfile,corpusfile):
     f = open(inputfile,"r",encoding="utf-8")
@@ -21,11 +28,19 @@ def GetCorpus(inputfile,corpusfile):
     for line in f:
         i=i+1
         if i%10000 == 0:
-            print(i)1
+            print(i)
+            # print(i)
+            print(time.time()-start)
         if len(line.strip().lower().split('\t')) > 1 :
             # print(line.strip().lower().split('\t'))
             passage = line.strip().lower().split("\t")[2] # +line.strip().lower().split("\t")[3]
             passage = passage.translate(trantab)
+            passage=' '.join(passage.split())
+            d=passage.split(' ')
+            stemmed=stemmer.stemWords(d)
+            for w in stemmed:
+                passage=passage+w+" "
+
             # word_tokens = word_tokenize(passage) 
             # passage=""
             # for word in word_tokens:
@@ -94,6 +109,23 @@ def GetBM25Score(Query, Passage, k1=1.2, b=0.75, delimiter=' ') :
     query_words= Query.strip().lower().translate(trantab)
     word_tokens = word_tokenize(query_words) 
     query_words = [w for w in word_tokens if not w in stop_words] 
+    passage_words=Passage.strip().lower().translate(trantab)
+    word_tokens = word_tokenize(passage_words) 
+    passage_words = [w for w in word_tokens if not w in stop_words] 
+    query_words=stemmer.stemWords(query_words)
+    # for w in query_words:
+    #     query_words_stem.append(ps.stem(w))
+    # query_words=query_words_stem
+    # print(query_words)
+    passage_words=Passage.strip().lower().translate(trantab)
+    word_tokens = word_tokenize(passage_words) 
+    passage_words = [w for w in word_tokens if not w in stop_words] 
+    passage_words=stemmer.stemWords(passage_words)
+    # passage_words_stem=[]
+    # for w in passage_words:
+    #     passage_words_stem.append(ps.stem(w))
+    # passage_words=passage_words_stem
+    
     passage_words=Passage.strip().lower().translate(trantab)
     word_tokens = word_tokenize(passage_words) 
     passage_words = [w for w in word_tokens if not w in stop_words] 
