@@ -8,8 +8,8 @@ Step 1 : Download Training  data ("Data.tsv") from codalab and keep it in curren
 
 Step 2 : Download Evaluation data  ("eval1_unlabelled.tsv") from codalab  keep it in current directory
 
-Step 3 : run "BaselineBM25.py" file for running BM25 technique
-			python BaselineBM25.py
+Step 3 : run "bm25original.py" file for running BM25 technique
+			python bm25original.py
 
 bm25original gave best results
 
