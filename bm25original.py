@@ -11,6 +11,7 @@ import Stemmer
 docIDFDict = {}
 avgDocLength = 0
 stop_words = set(stopwords.words("english"))
+print(stop_words)
 # print(cachedStopWords)
 intab = string.punctuation
 lenstr = len(string.punctuation)
@@ -27,8 +28,7 @@ def GetCorpus(inputfile,corpusfile):
     i=0
     for line in f:
         i=i+1
-        if i%10000 == 0:
-            print(i)
+        if i%100000 == 0:
             # print(i)
             print(time.time()-start)
         if len(line.strip().lower().split('\t')) > 1 :
@@ -38,18 +38,11 @@ def GetCorpus(inputfile,corpusfile):
             passage=' '.join(passage.split())
             d=passage.split(' ')
             stemmed=stemmer.stemWords(d)
-            for w in stemmed:
-                passage=passage+w+" "
-
-            # word_tokens = word_tokenize(passage) 
             # passage=""
-            # for word in word_tokens:
-                # if(word not in stop_words):
-                    # passage=passage+" "+word
-            # print(passage)
-            # passage = ''.join([word for word in passage.split() if word not in cachedStopWords])
+            for w in stemmed:
+                # if (w not in stop_words):
+                    passage=passage+w+" "
 
-        # passage='hi'
         fw.write(passage+"\n")
     f.close()
     fw.close()
@@ -73,7 +66,9 @@ def IDF_Generator(corpusfile, delimiter=' ', base=math.e) :
         # # doc[7]=doc[7].translate(string.punctuation)
         # print(doc)
         totalDocLength += len(doc)
-
+        # for x in range(0,len(doc)-1):
+            # doc[x]=doc[x]+doc[x+1]
+        # print(doc)
         doc = list(set(doc)) # Take all unique words
 
         for word in doc : #Updates n(q_i) values for all the words(q_i)
@@ -82,18 +77,22 @@ def IDF_Generator(corpusfile, delimiter=' ', base=math.e) :
             docFrequencyDict[word] += 1
 
         numOfDocuments = numOfDocuments + 1
-        if (numOfDocuments%50000==0):
-            print(numOfDocuments)                
-
+        if (numOfDocuments%500000==0):
+            print(numOfDocuments)
+            # print(len(docFrequencyDict))                
+    # pickle_out = open("docTermDict.pickle","wb") # Saves IDF scores in pickle file, which is optional
+    # pickle.dump(docFrequencyDict, pickle_out)
+    # pickle_out.close()
+    
     for word in docFrequencyDict:  #Calculate IDF scores for each word(q_i)
         docIDFDict[word] = math.log((numOfDocuments) / (docFrequencyDict[word]), base) #Why are you considering "numOfDocuments - docFrequencyDict[word]" instead of just "numOfDocuments"
 
     avgDocLength = totalDocLength / numOfDocuments
 
      
-    pickle_out = open("docIDFDict.pickle","wb") # Saves IDF scores in pickle file, which is optional
-    pickle.dump(docIDFDict, pickle_out)
-    pickle_out.close()
+    # pickle_out = open("docIDFDict.pickle","wb") # Saves IDF scores in pickle file, which is optional
+    # pickle.dump(docIDFDict, pickle_out)
+    # pickle_out.close()
 
 
     print("NumOfDocuments : ", numOfDocuments)
@@ -107,31 +106,20 @@ def GetBM25Score(Query, Passage, k1=1.2, b=0.75, delimiter=' ') :
     global docIDFDict,avgDocLength
 
     query_words= Query.strip().lower().translate(trantab)
-    word_tokens = word_tokenize(query_words) 
-    query_words = [w for w in word_tokens if not w in stop_words] 
-    passage_words=Passage.strip().lower().translate(trantab)
-    word_tokens = word_tokenize(passage_words) 
-    passage_words = [w for w in word_tokens if not w in stop_words] 
+    word_tokens = word_tokenize(query_words)
+    
+    query_words = [w for w in word_tokens if not w in stop_words]
     query_words=stemmer.stemWords(query_words)
-    # for w in query_words:
-    #     query_words_stem.append(ps.stem(w))
-    # query_words=query_words_stem
-    # print(query_words)
-    passage_words=Passage.strip().lower().translate(trantab)
-    word_tokens = word_tokenize(passage_words) 
-    passage_words = [w for w in word_tokens if not w in stop_words] 
-    passage_words=stemmer.stemWords(passage_words)
-    # passage_words_stem=[]
-    # for w in passage_words:
-    #     passage_words_stem.append(ps.stem(w))
-    # passage_words=passage_words_stem
+    # for x in range(0,len(query_words)-1):
+    #     query_words[x]=query_words[x+1] 
     
     passage_words=Passage.strip().lower().translate(trantab)
     word_tokens = word_tokenize(passage_words) 
     passage_words = [w for w in word_tokens if not w in stop_words] 
-    # passage_words = passage_words.split(delimiter)
-    # print(passage_words)
+    passage_words=stemmer.stemWords(passage_words)
     passageLen = len(passage_words)
+    # for x in range(0,passageLen-1):
+    #     passage_words[x]=passage_words[x]+passage_words[x+1]
     docTF = {}
     for word in set(query_words):   #Find Term Frequency of all query unique words
         docTF[word] = passage_words.count(word)
